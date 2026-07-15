@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generador de Contrato de Arrendamiento</title>
+<style>
+  :root{
+    --ink:#1c2a24;
+    --paper:#fbf9f4;
+    --line:#d8d2c2;
+    --accent:#5c6b4f;
+    --accent-dark:#3f4a37;
+    --muted:#7a7568;
+    --danger:#8c3d2f;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background:#eee9dd;
+    color:var(--ink);
+  }
+  header{
+    background:var(--accent-dark);
+    color:#f4f1e8;
+    padding:18px 28px;
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:6px;
+  }
+  header h1{
+    font-size:1.15rem;
+    margin:0;
+    font-weight:600;
+    letter-spacing:.3px;
+  }
+  header span{
+    font-size:.8rem;
+    color:#cfd3c2;
+  }
+  .layout{
+    display:grid;
+    grid-template-columns: 420px 1fr;
+    gap:0;
+    min-height: calc(100vh - 60px);
+  }
+  @media (max-width: 950px){
+    .layout{grid-template-columns: 1fr;}
+  }
+  .panel{
+    background:#f4f1e8;
+    padding:22px 24px 60px;
+    overflow-y:auto;
+    border-right:1px solid var(--line);
+  }
+  .panel h2{
+    font-size:.78rem;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--accent-dark);
+    border-bottom:1px solid var(--line);
+    padding-bottom:6px;
+    margin:26px 0 12px;
+  }
+  .panel h2:first-of-type{margin-top:0;}
+  label{
+    display:block;
+    font-size:.75rem;
+    color:var(--muted);
+    margin:10px 0 3px;
+  }
+  input, textarea, select{
+    width:100%;
+    padding:7px 9px;
+    border:1px solid var(--line);
+    border-radius:4px;
+    font-size:.85rem;
+    background:#fff;
+    color:var(--ink);
+    font-family: inherit;
+  }
+  input:focus, textarea:focus, select:focus{
+    outline:2px solid var(--accent);
+    outline-offset:1px;
+  }
+  .row2{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .checkline{
+    display:flex; align-items:center; gap:8px; margin-top:14px;
+  }
+  .checkline input{width:auto;}
+  .checkline label{margin:0; font-size:.8rem; color:var(--ink);}
+  .actions{
+    position:sticky;
+    bottom:0;
+    background:#f4f1e8;
+    padding-top:14px;
+    margin-top:20px;
+    border-top:1px solid var(--line);
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  button{
+    border:none;
+    border-radius:4px;
+    padding:10px 14px;
+    font-size:.85rem;
+    cursor:pointer;
+    font-weight:600;
+  }
+  .btn-primary{background:var(--accent); color:#fff;}
+  .btn-primary:hover{background:var(--accent-dark);}
+  .btn-secondary{background:#fff; color:var(--accent-dark); border:1px solid var(--accent);}
+  .btn-secondary:hover{background:#e9e5d6;}
+  .copied{color:var(--accent-dark); font-size:.75rem; text-align:center; height:14px;}
+  .preview-wrap{
+    padding:32px;
+    display:flex;
+    justify-content:center;
+  }
+  .paper{
+    background:var(--paper);
+    max-width:760px;
+    width:100%;
+    padding:52px 56px;
+    box-shadow:0 1px 3px rgba(0,0,0,.15), 0 8px 24px rgba(0,0,0,.08);
+    font-family:'Georgia','Times New Roman',serif;
+    font-size:.92rem;
+    line-height:1.55;
+    white-space:pre-wrap;
+    color:#20241d;
+  }
+  .field-empty{
+    background:#f3d9d0;
+    color:var(--danger);
+    padding:0 2px;
+    border-radius:2px;
+  }
+  @media print{
+    header, .panel{display:none;}
+    .layout{grid-template-columns:1fr;}
+    .preview-wrap{padding:0;}
+    .paper{box-shadow:none; max-width:100%; padding:0;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Generador de Contrato de Arrendamiento</h1>
+  <span>Captura los datos por depa y obtén el contrato listo</span>
+</header>
+
+<div class="layout">
+  <div class="panel">
+
+    <h2>Arrendadora</h2>
+    <label for="arrendadoraNombre">Nombre completo</label>
+    <input id="arrendadoraNombre" value="Cristina Edith García de Antonio">
+    <label for="arrendadoraDomicilio">Domicilio para notificaciones</label>
+    <textarea id="arrendadoraDomicilio" rows="2">Puerto La Paz 116, Casas Alemán, Gustavo A. Madero, 07580 Ciudad de México, CDMX</textarea>
+
+    <h2>Arrendataria</h2>
+    <label for="arrendatariaGenero">Género</label>
+    <select id="arrendatariaGenero">
+      <option value="Mujer">Mujer</option>
+      <option value="Hombre">Hombre</option>
+    </select>
+    <label for="arrendatariaNombre">Nombre completo</label>
+    <input id="arrendatariaNombre" placeholder="Ej. Felisa Valeria Trejo Castilla">
+    <label for="arrendatariaId">Identificación (IDMEX / folio)</label>
+    <input id="arrendatariaId" placeholder="Número de identificación">
+
+    <h2>Inmueble en renta</h2>
+    <label for="depNumero">Número de departamento</label>
+    <input id="depNumero" placeholder="Ej. 3">
+    <label for="calleNumero">Calle y número</label>
+    <input id="calleNumero" value="Puerto La Paz 132">
+    <div class="row2">
+      <div>
+        <label for="colonia">Colonia</label>
+        <input id="colonia" value="Casas Alemán">
+      </div>
+      <div>
+        <label for="alcaldia">Alcaldía / Municipio</label>
+        <input id="alcaldia" value="Gustavo A. Madero">
+      </div>
+    </div>
+    <div class="row2">
+      <div>
+        <label for="cp">Código postal</label>
+        <input id="cp" value="07580">
+      </div>
+      <div>
+        <label for="ciudad">Ciudad</label>
+        <input id="ciudad" value="Ciudad de México">
+      </div>
+    </div>
+
+    <h2>Condiciones económicas</h2>
+    <label for="rentaMensual">Renta mensual (MXN)</label>
+    <input id="rentaMensual" type="number" min="0" step="0.01" placeholder="Ej. 7500">
+    <label for="mantenimiento">Cuota de mantenimiento (MXN, 0 si no aplica)</label>
+    <input id="mantenimiento" type="number" min="0" step="0.01" value="0">
+    <label for="deposito">Depósito en garantía (MXN)</label>
+    <input id="deposito" type="number" min="0" step="0.01" placeholder="Se sugiere 1 mes de renta">
+    <div class="row2">
+      <div>
+        <label for="duracionMeses">Duración (meses forzosos)</label>
+        <input id="duracionMeses" type="number" min="1" placeholder="Ej. 12">
+      </div>
+      <div>
+        <label for="fechaInicioRenta">Inicio de pago de renta</label>
+        <input id="fechaInicioRenta" type="date">
+      </div>
+    </div>
+    <label for="fechaFirma">Fecha de firma del contrato</label>
+    <input id="fechaFirma" type="date">
+
+    <h2>Llaves y medios de acceso entregados</h2>
+    <label for="cantidadLlaves">Juegos de llaves metálicas entregados</label>
+    <input id="cantidadLlaves" type="number" min="0" placeholder="Ej. 2">
+
+    <div class="checkline">
+      <input type="checkbox" id="incluirNfc">
+      <label for="incluirNfc">Incluir llaves digitales / NFC</label>
+    </div>
+    <div id="bloqueNfc" style="display:none;">
+      <label for="cantidadNfc">Llaves / tarjetas de acceso electrónico o NFC entregadas</label>
+      <input id="cantidadNfc" type="number" min="0" placeholder="Ej. 1">
+    </div>
+
+    <h2>Fiador / Aval</h2>
+    <div class="checkline">
+      <input type="checkbox" id="incluirFiador" checked>
+      <label for="incluirFiador">Incluir fiador / aval</label>
+    </div>
+    <div id="bloqueFiador">
+      <label for="fiadorNombre">Nombre completo</label>
+      <input id="fiadorNombre" placeholder="Ej. Félix Trejo Martínez">
+      <label for="fiadorId">Identificación (IDMEX / folio)</label>
+      <input id="fiadorId" placeholder="Número de identificación">
+      <label for="fiadorDomicilio">Domicilio particular del fiador</label>
+      <textarea id="fiadorDomicilio" rows="2" placeholder="Calle, número, colonia, alcaldía, ciudad"></textarea>
+      <label for="garantiaDireccion">Dirección del inmueble dado en garantía</label>
+      <textarea id="garantiaDireccion" rows="2" placeholder="Calle, número, colonia, alcaldía, ciudad"></textarea>
+      <label for="garantiaFolioReal">Folio Real (Registro Público de la Propiedad)</label>
+      <input id="garantiaFolioReal" placeholder="Ej. 670848-56">
+    </div>
+
+    <div class="actions">
+      <button class="btn-primary" onclick="actualizar()">Actualizar contrato</button>
+      <button class="btn-secondary" onclick="copiarContrato()">Copiar texto</button>
+      <button class="btn-secondary" onclick="descargarTxt()">Descargar .txt</button>
+      <button class="btn-secondary" onclick="window.print()">Imprimir / Guardar PDF</button>
+      <div class="copied" id="msgCopiado"></div>
+    </div>
+  </div>
+
+  <div class="preview-wrap">
+    <div class="paper" id="preview">Llena el formulario para generar el contrato…</div>
+  </div>
+</div>
+
+<script>
+// ---------- Utilidades número a letras (pesos MXN) ----------
+const UNIDADES = ['', 'UN', 'DOS', 'TRES', 'CUATRO', 'CINCO', 'SEIS', 'SIETE', 'OCHO', 'NUEVE'];
+const DIEC = ['DIEZ','ONCE','DOCE','TRECE','CATORCE','QUINCE','DIECISÉIS','DIECISIETE','DIECIOCHO','DIECINUEVE'];
+const DECENAS = ['VEINTE','TREINTA','CUARENTA','CINCUENTA','SESENTA','SETENTA','OCHENTA','NOVENTA'];
+const CENTENAS = ['','CIENTO','DOSCIENTOS','TRESCIENTOS','CUATROCIENTOS','QUINIENTOS','SEISCIENTOS','SETECIENTOS','OCHOCIENTOS','NOVECIENTOS'];
+
+function convertirGrupo(n){
+  // n de 0 a 999
+  if(n === 0) return '';
+  if(n === 100) return 'CIEN';
+  let c = Math.floor(n/100), r = n%100, out = '';
+  if(c>0) out += CENTENAS[c] + ' ';
+  if(r>0){
+    if(r<10) out += UNIDADES[r];
+    else if(r<20) out += DIEC[r-10];
+    else{
+      let d = Math.floor(r/10), u = r%10;
+      if(u===0) out += DECENAS[d-2];
+      else out += DECENAS[d-2] + ' Y ' + UNIDADES[u];
+    }
+  }
+  return out.trim();
+}
+
+function numeroALetras(num){
+  num = Math.floor(num);
+  if(num === 0) return 'CERO';
+  let partes = [];
+  let millones = Math.floor(num/1000000);
+  let miles = Math.floor((num%1000000)/1000);
+  let resto = num%1000;
+
+  if(millones>0){
+    partes.push(millones===1 ? 'UN MILLÓN' : convertirGrupo(millones)+' MILLONES');
+  }
+  if(miles>0){
+    partes.push(miles===1 ? 'MIL' : convertirGrupo(miles)+' MIL');
+  }
+  if(resto>0){
+    partes.push(convertirGrupo(resto));
+  }
+  return partes.join(' ').replace(/\s+/g,' ').trim();
+}
+
+function montoALetras(monto){
+  monto = parseFloat(monto);
+  if(isNaN(monto)) return '';
+  let entero = Math.floor(monto);
+  let centavos = Math.round((monto - entero) * 100);
+  let centStr = String(centavos).padStart(2,'0');
+  return `${numeroALetras(entero)} PESOS ${centStr}/100 M.N.`;
+}
+
+function formatoMoneda(monto){
+  monto = parseFloat(monto);
+  if(isNaN(monto)) return '$0.00';
+  return '$' + monto.toLocaleString('es-MX', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+const MESES_LETRA = ['','UN','DOS','TRES','CUATRO','CINCO','SEIS','SIETE','OCHO','NUEVE','DIEZ','ONCE','DOCE',
+  'TRECE','CATORCE','QUINCE','DIECISÉIS','DIECISIETE','DIECIOCHO','DIECINUEVE','VEINTE','VEINTIUNO','VEINTIDÓS',
+  'VEINTITRÉS','VEINTICUATRO','VEINTICINCO','VEINTISÉIS','VEINTISIETE','VEINTIOCHO','VEINTINUEVE','TREINTA',
+  'TREINTA Y UNO','TREINTA Y DOS','TREINTA Y TRES','TREINTA Y CUATRO','TREINTA Y CINCO','TREINTA Y SEIS'];
+
+function mesesALetra(n){
+  n = parseInt(n);
+  if(isNaN(n) || n<1) return '';
+  if(n < MESES_LETRA.length) return MESES_LETRA[n];
+  return numeroALetras(n);
+}
+
+const ORDINALES = {
+  10:'DÉCIMA', 11:'DÉCIMA PRIMERA', 12:'DÉCIMA SEGUNDA', 13:'DÉCIMA TERCERA',
+  14:'DÉCIMA CUARTA', 15:'DÉCIMA QUINTA', 16:'DÉCIMA SEXTA', 17:'DÉCIMA SÉPTIMA',
+  18:'DÉCIMA OCTAVA', 19:'DÉCIMA NOVENA', 20:'VIGÉSIMA', 21:'VIGÉSIMA PRIMERA',
+  22:'VIGÉSIMA SEGUNDA'
+};
+function ordinal(n){ return ORDINALES[n] || `CLÁUSULA ${n}`; }
+
+function fechaLarga(fechaISO){
+  if(!fechaISO) return '';
+  const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const [y,m,d] = fechaISO.split('-').map(Number);
+  return `${d} de ${meses[m-1]} de ${y}`;
+}
+
+// ---------- Lectura de campos ----------
+function val(id){ return document.getElementById(id).value.trim(); }
+function marcador(texto, etiqueta){
+  return texto && texto.length ? texto : `[FALTA: ${etiqueta}]`;
+}
+
+function toggleFiador(){
+  document.getElementById('bloqueFiador').style.display =
+    document.getElementById('incluirFiador').checked ? 'block' : 'none';
+  actualizar();
+}
+document.getElementById('incluirFiador').addEventListener('change', toggleFiador);
+
+function toggleNfc(){
+  document.getElementById('bloqueNfc').style.display =
+    document.getElementById('incluirNfc').checked ? 'block' : 'none';
+  actualizar();
+}
+document.getElementById('incluirNfc').addEventListener('change', toggleNfc);
+
+// ---------- Construcción del contrato ----------
+function generarTexto(){
+  const arrendadoraNombre = marcador(val('arrendadoraNombre'), 'nombre de la arrendadora');
+  const arrendadoraDomicilio = marcador(val('arrendadoraDomicilio'), 'domicilio de la arrendadora');
+  const arrendatariaGenero = document.getElementById('arrendatariaGenero').value;
+  const arrendatariaPrefijo = arrendatariaGenero === 'Hombre' ? 'EL SEÑOR' : 'LA SEÑORA';
+  const arrendatariaPronombreMismo = arrendatariaGenero === 'Hombre' ? 'el mismo' : 'la misma';
+  const arrendatariaNombre = marcador(val('arrendatariaNombre'), 'nombre de la arrendataria');
+  const arrendatariaId = marcador(val('arrendatariaId'), 'identificación de la arrendataria');
+
+  const depNumero = marcador(val('depNumero'), 'número de depto');
+  const calleNumero = marcador(val('calleNumero'), 'calle y número');
+  const colonia = marcador(val('colonia'), 'colonia');
+  const alcaldia = marcador(val('alcaldia'), 'alcaldía');
+  const cp = marcador(val('cp'), 'código postal');
+  const ciudad = marcador(val('ciudad'), 'ciudad');
+
+  const domicilioInmueble = `DEPARTAMENTO #${depNumero} DEL INMUEBLE UBICADO EN CALLE ${calleNumero} COL. ${colonia}, ALCALDÍA ${alcaldia}, C.P. ${cp}, ${ciudad}`;
+
+  const rentaNum = val('rentaMensual');
+  const renta = formatoMoneda(rentaNum || 0);
+  const rentaLetra = rentaNum ? montoALetras(rentaNum) : '[FALTA: monto de renta]';
+
+  const mantNum = val('mantenimiento');
+  const mant = formatoMoneda(mantNum || 0);
+  const mantLetra = (mantNum && parseFloat(mantNum) > 0) ? montoALetras(mantNum) : 'CERO PESOS 00/100 M.N.';
+
+  const depNum = val('deposito');
+  const deposito = formatoMoneda(depNum || 0);
+  const depositoLetra = depNum ? montoALetras(depNum) : '[FALTA: monto de depósito]';
+
+  const duracionMeses = marcador(val('duracionMeses'), 'duración en meses');
+  const duracionLetra = val('duracionMeses') ? mesesALetra(val('duracionMeses')) : '[FALTA]';
+
+  const fechaInicioRenta = val('fechaInicioRenta') ? fechaLarga(val('fechaInicioRenta')) : '[FALTA: fecha de inicio de renta]';
+  const fechaFirma = val('fechaFirma') ? fechaLarga(val('fechaFirma')) : '[FALTA: fecha de firma]';
+
+  const incluyeFiador = document.getElementById('incluirFiador').checked;
+
+  // Numeración dinámica: DÉCIMA TERCERA (13) es fija; la cláusula de llaves
+  // y accesos siempre aparece; el fiador es opcional.
+  let numActual = 13;
+  numActual++;
+  const numAccesos = numActual;
+  let numFiador;
+  if(incluyeFiador){ numActual++; numFiador = numActual; }
+  const numObras = ++numActual;
+  const numTelefono = ++numActual;
+  const numModificacion = ++numActual;
+  const numDisposiciones = ++numActual;
+
+  const cantidadLlaves = marcador(val('cantidadLlaves'), 'cantidad de llaves metálicas');
+  const tieneNfc = document.getElementById('incluirNfc').checked;
+  const cantidadNfc = tieneNfc ? marcador(val('cantidadNfc'), 'cantidad de llaves/tarjetas NFC') : '';
+
+  const entregaTexto = tieneNfc
+    ? `${cantidadLlaves} juego(s) de llaves metálicas y ${cantidadNfc} llave(s)/tarjeta(s) de acceso electrónico o NFC`
+    : `${cantidadLlaves} juego(s) de llaves metálicas`;
+
+  const parrafoNfc = tieneNfc ? `
+
+Respecto de las llaves o tarjetas de acceso electrónico/NFC, "LA ARRENDATARIA" reconoce que su programación, activación y duplicado dependen exclusivamente de "LA ARRENDADORA" o del sistema de control de acceso correspondiente, por lo que "LA ARRENDATARIA" no podrá generarlas, programarlas o duplicarlas por su cuenta bajo ninguna circunstancia. En caso de requerir dispositivos adicionales, o de reposición por pérdida, robo o extravío, "LA ARRENDATARIA" deberá solicitarlo a "LA ARRENDADORA", corriendo a su cargo el costo que dicha reposición o programación adicional genere.` : '';
+
+  const mencionNfcDevolucion = tieneNfc ? ' y dispositivos electrónicos/NFC' : '';
+  const mencionNfcPenalizacion = tieneNfc ? ', tarjetas o reprogramación de los sistemas de acceso' : '';
+
+  const clausulaAccesos = `
+
+${ordinal(numAccesos)}. - DE LAS LLAVES Y MEDIOS DE ACCESO. "LA ARRENDADORA" hace entrega a "LA ARRENDATARIA", a la firma del presente contrato, de ${entregaTexto}, mismas que "LA ARRENDATARIA" reconoce haber recibido completas y en buen estado.
+
+Respecto de las llaves metálicas, "LA ARRENDATARIA" podrá mandar hacer copias o duplicados adicionales, debiendo notificarlo previamente y por escrito a "LA ARRENDADORA", indicando la cantidad. El costo de dichas copias correrá a cargo de "LA ARRENDATARIA", sin que ello le otorgue derecho de propiedad, retención o compensación alguna sobre las mismas, independientemente de quién haya cubierto su costo.${parrafoNfc}
+
+Al término del arrendamiento, ya sea por vencimiento del plazo, falta de renovación o rescisión del presente contrato, "LA ARRENDATARIA" se obliga a hacer entrega inmediata a "LA ARRENDADORA" de la totalidad de las llaves metálicas${mencionNfcDevolucion} en su poder, incluyendo los originales y cualquier copia o duplicado de llaves metálicas que hubiere mandado hacer, sin que pueda condicionar dicha entrega a pago, contraprestación o reconocimiento alguno.
+
+El incumplimiento de lo anterior se considerará como negativa a desocupar y entregar "EL BIEN", facultando a "LA ARRENDADORA" para retener el depósito en garantía señalado en la Cláusula DÉCIMA PRIMERA y aplicarlo al costo de cambio de chapas, cerraduras${mencionNfcPenalizacion} que resulte necesario, sin perjuicio de las demás acciones legales que procedan.`;
+
+  let clausulaFiador = '';
+  let firmaFiador = '';
+
+  if(incluyeFiador){
+    const fiadorNombre = marcador(val('fiadorNombre'), 'nombre del fiador');
+    const fiadorId = marcador(val('fiadorId'), 'identificación del fiador');
+    const fiadorDomicilio = marcador(val('fiadorDomicilio'), 'domicilio del fiador');
+    const garantiaDireccion = marcador(val('garantiaDireccion'), 'dirección del inmueble en garantía');
+    const garantiaFolioReal = marcador(val('garantiaFolioReal'), 'folio real');
+
+    clausulaFiador = `
+${ordinal(numFiador)}. - Firma el presente contrato en su carácter de FIADOR y pagador de todas y cada una de las obligaciones contraídas por "LA ARRENDATARIA", el/la señor(a) ${fiadorNombre}, quien se constituye como FIADOR y obligado solidario con "LA ARRENDATARIA", renunciando a los beneficios de orden y excusión que le pudieren corresponder, aceptando que no cesará su responsabilidad como fiador hasta que "LA ARRENDADORA" se dé por recibida del inmueble arrendado.
+
+Asimismo, señala como garantía en primer lugar para garantizar el cumplimiento de las obligaciones del presente contrato, el inmueble ubicado en ${garantiaDireccion}, el cual se encuentra inscrito en el Registro Público de la Propiedad y de Comercio bajo el número de FOLIO REAL ${garantiaFolioReal}, manifestando que se encuentra libre de gravámenes, situación que deberá conservar durante la vigencia del presente contrato.
+
+De igual forma, manifiesta que los bienes muebles de su propiedad son sujetos de embargo en términos de ley. Para efectos de notificaciones y diligencias derivadas del presente contrato, el FIADOR señala como domicilio particular para oír y recibir notificaciones el ubicado en ${fiadorDomicilio}, mismo que coincide con el inmueble dado en garantía señalado anteriormente.
+
+El FIADOR se obliga a notificar por escrito a "LA ARRENDADORA" cualquier cambio de domicilio dentro de los 10 (diez) días naturales siguientes a que ocurra; en caso contrario, serán válidas las notificaciones que se realicen en el domicilio aquí señalado.
+
+En caso de que "LA ARRENDATARIA" no pueda o no quiera entregar el inmueble, el FIADOR podrá hacer entrega de "EL BIEN" en su lugar.
+
+EN CASO DE RENOVACIÓN DEL PRESENTE CONTRATO DE ARRENDAMIENTO, SERÁ CAUSA DE RESCISIÓN SI DENTRO DE LOS 30 (TREINTA) DÍAS POSTERIORES A LA RENOVACIÓN DE ESTE, "LA ARRENDATARIA" NO PRESENTA AL FIADOR PARA LA FIRMA DEL CONTRATO.
+`;
+    firmaFiador = `
+
+"FIADOR"
+${fiadorNombre}
+IDMEX ${fiadorId}`;
+  }
+
+  const textoFinal = `CONTRATO DE ARRENDAMIENTO QUE CELEBRAN POR UNA PARTE LA SEÑORA ${arrendadoraNombre}, A QUIEN EN LO SUCESIVO SE LE DENOMINARÁ COMO "LA ARRENDADORA", Y POR LA OTRA PARTE ${arrendatariaPrefijo} ${arrendatariaNombre}, A QUIEN EN LO SUCESIVO SE LE DENOMINARÁ COMO "LA ARRENDATARIA", RESPECTO DEL ARRENDAMIENTO DEL ${domicilioInmueble}, LAS CUALES SE SUJETAN AL TENOR DE LAS SIGUIENTES DECLARACIONES Y CLÁUSULAS:
+
+D E C L A R A C I O N E S
+
+I.- Declara "LA ARRENDADORA":
+
+A.- Que tiene capacidad suficiente y legal para obligarse en los términos y condiciones del presente contrato de arrendamiento.
+
+B.- Que tiene facultad de propietario y desea dar en arrendamiento a "LA ARRENDATARIA", el ${domicilioInmueble}, materia del presente contrato.
+
+C.- Que señala como domicilio para efectos del presente contrato y cualquier comunicación, el ubicado en ${arrendadoraDomicilio}.
+
+Declara "LA ARRENDATARIA":
+
+A.- Que tiene capacidad suficiente y legal para obligarse en los términos y condiciones del presente contrato de arrendamiento.
+
+B.- Que desea tomar en arrendamiento el inmueble, objeto del presente contrato.
+
+C.- Que para efectos del presente contrato señala como su domicilio el inmueble arrendado materia del presente contrato.
+
+C L A U S U L A S
+
+PRIMERA. - "LA ARRENDADORA" da en arrendamiento y "LA ARRENDATARIA" recibe el inmueble arrendado que es el ${domicilioInmueble}, al inmueble descrito en esta cláusula en lo sucesivo se les denominará como "EL BIEN".
+
+SEGUNDA. - "LA ARRENDATARIA" pagará a "LA ARRENDADORA" o a quien sus derechos representen, en el domicilio de la segunda; una renta mensual de ${renta} (${rentaLetra}) cantidad que cubrirá por meses adelantados y que se obliga a pagar debiendo entregar "LA ARRENDADORA" el recibo respectivo.
+
+Adicionalmente pagará LA ARRENDATARIA una cuota de mantenimiento que asciende a la cantidad de ${mant} (${mantLetra}) cantidad que se destinará a las reparaciones y mantenimiento de las áreas comunes del inmueble arrendado.
+
+TERCERA. - "LA ARRENDATARIA" cubrirá la renta por mensualidades adelantadas, precisamente dentro de los 5 primeros días de cada mes, sin necesidad de previo cobro, mediante pago en efectivo o depósito bancario, en ningún momento se considerará renovado el presente contrato, por el hecho de que "LA ARRENDADORA" reciba el pago de la renta en forma distinta a la estipulada.
+
+Por el simple retraso o falta de pago de una de las rentas, en la forma y términos establecidos en la presente cláusula, "LA ARRENDATARIA" faculta a "LA ARRENDADORA" a exigir el cumplimiento de este contrato o su rescisión, sin necesidad de declaración judicial, obligándose "LA ARRENDATARIA" a pagar un 10% más del valor de la renta como pena convencional para el caso de no pagar oportunamente la misma, cantidad que pagará por cada mes de renta que permanezca en mora.
+
+Lo anterior, sin perjuicio de ejercer las acciones legales conducentes para el cobro y, en su caso, la desocupación del inmueble.
+
+CUARTA. - "LA ARRENDATARIA" pagará íntegramente las mensualidades de renta y pago de servicios, aun cuando ocupe el inmueble parte del mes.
+
+QUINTA. - "LA ARRENDATARIA" recibe "EL BIEN" arrendado en buen estado, con las instalaciones eléctricas y sanitarias completas, a su entera satisfacción y de conformidad, debiendo devolver al término del arrendamiento el "BIEN" en las mismas condiciones.
+
+Asimismo, "LA ARRENDATARIA" se obliga a efectuar todas las obras de conservación durante el tiempo que dure el arrendamiento, mismas que serán por su cuenta y quedarán a beneficio de "EL BIEN", salvo las que por ley correspondan a "LA ARRENDADORA".
+
+SEXTA. - "LA ARRENDATARIA" no podrá hacer uso de "EL BIEN" más que como CASA HABITACIÓN, en caso de querer darle uso diverso al establecido, deberá contar con el consentimiento por escrito de "LA ARRENDADORA"; en caso contrario será causa de rescisión del presente contrato.
+
+SÉPTIMA. - Todos los gastos e impuestos que ocasione el otorgamiento, firma y registro del presente contrato, serán por cuenta exclusiva de "LA ARRENDADORA".
+
+OCTAVA. - Queda expresamente prohibido a "LA ARRENDATARIA" ceder o traspasar los derechos del presente contrato de lo contrario será causa de rescisión del presente contrato, ni podrá subarrendar total o parcialmente "EL BIEN" a terceros.
+
+NOVENA. - El presente contrato tendrá una duración de ${duracionMeses} mes(es) forzoso(s) (${duracionLetra}) para ambas partes.
+
+"LA ARRENDATARIA" empezará a pagar la renta a partir del ${fechaInicioRenta} y la renta empezará a correr el mismo día.
+
+Pactan las partes que la renta se incrementará anualmente de acuerdo con el porcentaje de la inflación reportada por el Banco de México en el año inmediato anterior al del año de vencimiento del presente contrato.
+
+Previo a la terminación del arrendamiento, con 30 días de anticipación "LA ARRENDATARIA" deberá manifestar a "LA ARRENDADORA" su deseo de continuar con el mismo, en caso de no existir prorroga "LA ARRENDATARIA" se obliga a desocupar el inmueble el día del vencimiento del contrato en caso de no desocuparlo pagará a "LA ARRENDADORA" un sobre precio de la renta de ${renta} (${rentaLetra}) por cada mes que transcurra y que siga ocupando el inmueble "LA ARRENDATARIA" sin que se firme un nuevo contrato o en contra de la voluntad de "LA ARRENDADORA".
+
+Será obligación de LA "ARRENDADORA" el registro digital del presente contrato ante la autoridad correspondiente dentro de los 30 días siguientes a la celebración del presente contrato.
+
+DÉCIMA. - "LA ARRENDATARIA" conviene y se obliga expresamente a no retener las rentas en ningún caso y por ningún motivo, ni por concepto de mejoras o reparaciones que ${arrendatariaPronombreMismo} hiciere a "EL BIEN", sino que pagará íntegramente la renta en la forma y tiempo convenido, obligándose a responder de los perjuicios "EL BIEN" sufra por su culpa o por negligencia de sus ocupantes.
+
+DÉCIMA PRIMERA. - Para seguridad y garantía en el cumplimiento de todo lo estipulado en el presente contrato, "LA ARRENDATARIA" entrega a "LA ARRENDADORA" lo siguiente:
+
+1.- La cantidad de ${deposito} (${depositoLetra}) cantidad que se devolverá al término del arrendamiento, siempre que nada adeuden a "LA ARRENDADORA", pudiendo ser adeudos por consumo de energía eléctrica, teléfono o agua y entreguen la localidad en buen estado, es decir, con el deterioro normal que sufriere por el uso.
+
+DÉCIMA SEGUNDA. - Serán a cargo de "LA ARRENDATARIA" todos y cada uno de los gastos por los servicios de energía eléctrica, teléfono, consumo de agua, etc., de su unidad privativa, obligándose a responder por todos y cada uno de los asuntos relacionados con estos servicios.
+
+Adicionalmente, "LA ARRENDATARIA" reconoce que el inmueble cuenta con sistemas o instalaciones de uso común (como la bomba de agua u otros equipos que abastecen a la totalidad de los departamentos), cuyo consumo de agua y energía eléctrica es independiente de la cuota de mantenimiento señalada en la Cláusula SEGUNDA y no podrá destinarse a un fin distinto al de dichos servicios comunes. Por tal motivo, "LA ARRENDATARIA" se obliga a pagar la parte proporcional que le corresponda de dicho consumo común, mismo que será calculado por "LA ARRENDADORA" y notificado periódicamente a cada inquilino mediante un recibo detallado, el cual se hará llegar de forma electrónica y de manera personal (si lo solicita "LA ARRENDATARIA").
+
+Dicho pago deberá cubrirse a "LA ARRENDADORA" a más tardar 5 (cinco) días naturales previos a la fecha límite de pago señalada en el recibo correspondiente, siendo aplicable en caso de incumplimiento la pena convencional prevista en la Cláusula TERCERA para la falta de pago oportuno de la renta.
+
+DÉCIMA TERCERA. - A "LA ARRENDATARIA" le está expresamente prohibido tener, almacenar, tratar, generar o desechar sustancias, materiales, desechos o residuos que se consideren peligrosos, entendiéndose por tales, cualquier producto químico o tóxico, contaminante, desperdicios, sustancias corrosivas, deletéreas o inflamables, bajo cualquier ley o tratado internacional, regulación federal, estatal, local o municipal también le está prohibido tener botes, macetas, bicicletas o cualquier objeto en los pasillos o patio y tampoco podrá tener música a alto volumen en su departamento y en general le está prohibido realizar actos o acciones que molesten a los demás inquilinos.
+${clausulaAccesos}
+${clausulaFiador}
+
+${ordinal(numObras)}. - "LA ARRENDATARIA" no podrá realizar obras en "EL BIEN" objeto de este contrato, sin que medie aviso por escrito de conformidad por parte de "LA ARRENDADORA".
+
+Las obras o mejoras que se hayan hecho por cuenta de "LA ARRENDATARIA" quedarán en beneficio de la finca y se podrán realizar siempre que no se dañe o altere la esencia de "EL BIEN".
+
+${ordinal(numTelefono)}. - "LA ARRENDATARIA" se obliga si así lo deseare, a contratar el servicio de teléfono, así como a realizar los pagos oportunamente de dicho servicio, obligándose a responder por todos y cada uno de los asuntos relacionados con el mismo, debiendo entregar mensualmente copia a "LA ARRENDADORA" de los pagos realizados, para que exista la certeza de que no se acumularán adeudos por este concepto y pagar la parte proporcional del suministro de agua.
+
+${ordinal(numModificacion)}. - Cualquier modificación a los términos y condiciones establecidas en el presente instrumento deberá ser acordada por las partes mediante un convenio modificatorio, mismo que deberá constar por escrito.
+
+${ordinal(numDisposiciones)}. - Ambas partes convienen en manifestar que en la celebración del presente contrato, no existe error, dolo o mala fe, ni algún otro vicio de consentimiento que pudiera invalidarlo, conviniendo que en todo lo no previsto en este contrato, se someterá a lo estipulado por el Código Civil vigente en la Ciudad de México, obligándose a pasar por el mismo en todo tiempo, momento y lugar determinado, renunciando al fuero de sus domicilios presentes o futuros, sujetándose las partes a los Tribunales de la Ciudad de México del Tribunal Superior de Justicia de la Ciudad de México.
+
+El presente contrato se extiende por triplicado, previa lectura de su contenido y lo firman las partes que en él intervienen, en la Ciudad de México el ${fechaFirma}.
+
+
+"LA ARRENDATARIA"
+${arrendatariaNombre}
+IDMEX ${arrendatariaId}
+
+"LA ARRENDADORA"
+${arrendadoraNombre}${firmaFiador}`;
+
+  if(arrendatariaGenero === 'Hombre'){
+    return textoFinal
+      .split('"LA ARRENDATARIA"').join('"EL ARRENDATARIO"')
+      .split('LA ARRENDATARIA').join('EL ARRENDATARIO');
+  }
+  return textoFinal;
+}
+
+function actualizar(){
+  document.getElementById('preview').textContent = generarTexto();
+}
+
+function copiarContrato(){
+  const texto = generarTexto();
+  navigator.clipboard.writeText(texto).then(()=>{
+    const msg = document.getElementById('msgCopiado');
+    msg.textContent = 'Contrato copiado ✓';
+    setTimeout(()=> msg.textContent = '', 2000);
+  });
+}
+
+function descargarTxt(){
+  const texto = generarTexto();
+  const nombreArrendataria = val('arrendatariaNombre') || 'contrato';
+  const depNum = val('depNumero') || '';
+  const nombreArchivo = `Contrato_Depto${depNum}_${nombreArrendataria.replace(/\s+/g,'_')}.txt`;
+  const blob = new Blob([texto], {type:'text/plain;charset=utf-8'});
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = nombreArchivo;
+  link.click();
+}
+
+// Actualiza en vivo al escribir
+document.querySelectorAll('input, textarea, select').forEach(el => {
+  el.addEventListener('input', actualizar);
+  el.addEventListener('change', actualizar);
+});
+
+// Sugerir depósito = renta al escribir renta, si el depósito está vacío
+document.getElementById('rentaMensual').addEventListener('input', function(){
+  const depositoEl = document.getElementById('deposito');
+  if(!depositoEl.value){
+    depositoEl.value = this.value;
+    actualizar();
+  }
+});
+
+actualizar();
+</script>
+
+</body>
+</html>
