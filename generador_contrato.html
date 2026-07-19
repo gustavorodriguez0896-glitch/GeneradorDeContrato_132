@@ -131,7 +131,23 @@
     font-size:.92rem;
     line-height:1.55;
     white-space:pre-wrap;
+    text-align: justify;
     color:#20241d;
+  }
+  .cierre-firma{
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  .firma-grid{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 40px;
+    row-gap: 24px;
+    margin-top: 40px;
+    white-space: normal;
+  }
+  .firma-block p{
+    margin: 2px 0;
   }
   .field-empty{
     background:#f3d9d0;
@@ -449,7 +465,6 @@ Al término del arrendamiento, ya sea por vencimiento del plazo, falta de renova
 El incumplimiento de lo anterior se considerará como negativa a desocupar y entregar "EL BIEN", facultando a "LA ARRENDADORA" para retener el depósito en garantía señalado en la Cláusula DÉCIMA PRIMERA y aplicarlo al costo de cambio de chapas, cerraduras${mencionNfcPenalizacion} que resulte necesario, sin perjuicio de las demás acciones legales que procedan.`;
 
   let clausulaFiador = '';
-  let firmaFiador = '';
 
   if(incluyeFiador){
     const fiadorNombre = marcador(val('fiadorNombre'), 'nombre del fiador');
@@ -471,11 +486,6 @@ En caso de que "LA ARRENDATARIA" no pueda o no quiera entregar el inmueble, el F
 
 EN CASO DE RENOVACIÓN DEL PRESENTE CONTRATO DE ARRENDAMIENTO, SERÁ CAUSA DE RESCISIÓN SI DENTRO DE LOS 30 (TREINTA) DÍAS POSTERIORES A LA RENOVACIÓN DE ESTE, "LA ARRENDATARIA" NO PRESENTA AL FIADOR PARA LA FIRMA DEL CONTRATO.
 `;
-    firmaFiador = `
-
-"FIADOR"
-${fiadorNombre}
-IDMEX ${fiadorId}`;
   }
 
   const textoFinal = `CONTRATO DE ARRENDAMIENTO QUE CELEBRAN POR UNA PARTE LA SEÑORA ${arrendadoraNombre}, A QUIEN EN LO SUCESIVO SE LE DENOMINARÁ COMO "LA ARRENDADORA", Y POR LA OTRA PARTE ${arrendatariaPrefijo} ${arrendatariaNombre}, A QUIEN EN LO SUCESIVO SE LE DENOMINARÁ COMO "LA ARRENDATARIA", RESPECTO DEL ARRENDAMIENTO DEL ${domicilioInmueble}, LAS CUALES SE SUJETAN AL TENOR DE LAS SIGUIENTES DECLARACIONES Y CLÁUSULAS:
@@ -560,30 +570,91 @@ ${ordinal(numModificacion)}. - Cualquier modificación a los términos y condici
 
 ${ordinal(numDisposiciones)}. - Ambas partes convienen en manifestar que en la celebración del presente contrato, no existe error, dolo o mala fe, ni algún otro vicio de consentimiento que pudiera invalidarlo, conviniendo que en todo lo no previsto en este contrato, se someterá a lo estipulado por el Código Civil vigente en la Ciudad de México, obligándose a pasar por el mismo en todo tiempo, momento y lugar determinado, renunciando al fuero de sus domicilios presentes o futuros, sujetándose las partes a los Tribunales de la Ciudad de México del Tribunal Superior de Justicia de la Ciudad de México.
 
-El presente contrato se extiende por triplicado, previa lectura de su contenido y lo firman las partes que en él intervienen, en la Ciudad de México el ${fechaFirma}.
+El presente contrato se extiende por triplicado, previa lectura de su contenido y lo firman las partes que en él intervienen, en la Ciudad de México el ${fechaFirma}.`;
+
+  function aplicarGenero(texto){
+    if(arrendatariaGenero === 'Hombre'){
+      return texto.split('"LA ARRENDATARIA"').join('"EL ARRENDATARIO"').split('LA ARRENDATARIA').join('EL ARRENDATARIO');
+    }
+    return texto;
+  }
+
+  const arrendatariaTermino = arrendatariaGenero === 'Hombre' ? 'EL ARRENDATARIO' : 'LA ARRENDATARIA';
+
+  const datosFirma = { arrendatariaTermino, arrendatariaNombre, arrendatariaId, arrendadoraNombre, incluyeFiador };
+  if(incluyeFiador){
+    datosFirma.fiadorNombre = marcador(val('fiadorNombre'), 'nombre del fiador');
+    datosFirma.fiadorId = marcador(val('fiadorId'), 'identificación del fiador');
+  }
+
+  let firmasTexto = `
 
 
-"LA ARRENDATARIA"
+"${arrendatariaTermino}"
 ${arrendatariaNombre}
 IDMEX ${arrendatariaId}
 
 "LA ARRENDADORA"
-${arrendadoraNombre}${firmaFiador}`;
+${arrendadoraNombre}`;
+  if(incluyeFiador){
+    firmasTexto += `
 
-  if(arrendatariaGenero === 'Hombre'){
-    return textoFinal
-      .split('"LA ARRENDATARIA"').join('"EL ARRENDATARIO"')
-      .split('LA ARRENDATARIA').join('EL ARRENDATARIO');
+"FIADOR"
+${datosFirma.fiadorNombre}
+IDMEX ${datosFirma.fiadorId}`;
   }
-  return textoFinal;
+
+  return {
+    texto: aplicarGenero(textoFinal + firmasTexto),
+    cuerpo: aplicarGenero(textoFinal),
+    firmas: datosFirma
+  };
+}
+
+function escapeHtml(str){
+  return str
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;');
 }
 
 function actualizar(){
-  document.getElementById('preview').textContent = generarTexto();
+  const resultado = generarTexto();
+  const marcador = 'El presente contrato se extiende por triplicado';
+  const idx = resultado.cuerpo.indexOf(marcador);
+  const preview = document.getElementById('preview');
+
+  const antesDeCierre = idx === -1 ? resultado.cuerpo : resultado.cuerpo.slice(0, idx);
+  const cierreParrafo = idx === -1 ? '' : resultado.cuerpo.slice(idx);
+
+  const f = resultado.firmas;
+
+  let firmasHtml = `<div class="firma-grid">
+    <div class="firma-block">
+      <p>"${escapeHtml(f.arrendatariaTermino)}"</p>
+      <p>${escapeHtml(f.arrendatariaNombre)}</p>
+      <p>IDMEX ${escapeHtml(f.arrendatariaId)}</p>
+    </div>
+    <div class="firma-block">
+      <p>"LA ARRENDADORA"</p>
+      <p>${escapeHtml(f.arrendadoraNombre)}</p>
+    </div>`;
+  if(f.incluyeFiador){
+    firmasHtml += `
+    <div class="firma-block">
+      <p>"FIADOR"</p>
+      <p>${escapeHtml(f.fiadorNombre)}</p>
+      <p>IDMEX ${escapeHtml(f.fiadorId)}</p>
+    </div>`;
+  }
+  firmasHtml += `</div>`;
+
+  preview.innerHTML =
+    `<div>${escapeHtml(antesDeCierre)}</div><div class="cierre-firma">${escapeHtml(cierreParrafo)}${firmasHtml}</div>`;
 }
 
 function copiarContrato(){
-  const texto = generarTexto();
+  const texto = generarTexto().texto;
   navigator.clipboard.writeText(texto).then(()=>{
     const msg = document.getElementById('msgCopiado');
     msg.textContent = 'Contrato copiado ✓';
@@ -592,7 +663,7 @@ function copiarContrato(){
 }
 
 function descargarTxt(){
-  const texto = generarTexto();
+  const texto = generarTexto().texto;
   const nombreArrendataria = val('arrendatariaNombre') || 'contrato';
   const depNum = val('depNumero') || '';
   const nombreArchivo = `Contrato_Depto${depNum}_${nombreArrendataria.replace(/\s+/g,'_')}.txt`;
